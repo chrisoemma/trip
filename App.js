@@ -16,11 +16,13 @@ import {
   StatusBar,
 } from 'react-native';
 import Login from './src/screens/auth/Login';
+import Trips from './src/screens/tabs/Trips';
+
 
 
 const App=() => {
   return (
-   <Login />
+   <Trips />
 
   );
 };
