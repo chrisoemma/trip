@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Text,StyleSheet, View, ScrollView } from 'react-native';
 import { Table, TableWrapper, Row } from 'react-native-table-component';
 
-export default class Trips extends Component {
+export default class ClosedTrips extends Component {
   constructor(props) {
     super(props);
     this.state = {
@@ -59,18 +59,19 @@ export default class Trips extends Component {
   }
 }
 
+
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#edf1f2',
-  height: '100%', },
-  header: { height: 50, backgroundColor: '#2464c9' },
-  text: { textAlign: 'center', fontWeight: '100',color:'#fff' },
-  dataText:{ textAlign: 'center', fontWeight: '100'},
-  dataWrapper: { marginTop: -1 },
-  row: { height: 40, backgroundColor: '#E7E6E1' },
-  topColor: {
-    backgroundColor: '#2661bf',
-    height: 100,
-    borderBottomRightRadius:30,
-    borderBottomStartRadius:30
-  },
-});
+	container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#edf1f2',
+	height: '100%', },
+	header: { height: 50, backgroundColor: '#2464c9' },
+	text: { textAlign: 'center', fontWeight: '100',color:'#fff' },
+	dataText:{ textAlign: 'center', fontWeight: '100'},
+	dataWrapper: { marginTop: -1 },
+	row: { height: 40, backgroundColor: '#E7E6E1' },
+	topColor: {
+	  backgroundColor: '#2661bf',
+	  height: 100,
+	  borderBottomRightRadius:30,
+	  borderBottomStartRadius:30
+	},
+  });
