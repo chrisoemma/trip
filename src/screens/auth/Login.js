@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -7,23 +7,34 @@ import {
   Text,
   TouchableOpacity,
   Keyboard,
-} from 'react-native';
-import {Input, Button} from 'react-native-elements';
-import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
-import {Formik} from 'formik';
-import * as yup from 'yup';
+  ActivityIndicator
+} from "react-native";
+import { Input, Button } from "react-native-elements";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { Formik } from "formik";
+import * as yup from "yup";
+
+import { AsyncStorage } from '@react-native-community/async-storage';
+import { AuthContext } from "../../components/Context";
+
+
+
 
 const phoneRegExp = /^((\\+[1-9]{1,9}[ \\-]*)|(\\([0-9]{2,3}\\)[ \\-]*)|([0-9]{2,4})[ \\-]*)*?[0-9]{3,4}?[ \\-]*[0-9]{3,4}?$/;
 const LoginSchema = yup.object({
   phoneNumber: yup
     .string()
-    .required('Phone number is required')
-    .matches(phoneRegExp, 'Phone number is not valid'),
-  password: yup.string().required('Password required').min(6),
+    .required("Phone number is required")
+    .matches(phoneRegExp, "Phone number is not valid"),
+  password: yup.string().required("Password required").min(6),
 });
 
 const Login = () => {
+
+  const {signIn} = React.useContext(AuthContext);
+
   return (
+
     <View style={styles.container}>
       <View style={styles.topColor}>
         <Text style={styles.textColor}>Trip</Text>
@@ -32,34 +43,72 @@ const Login = () => {
         <Text style={styles.headerText}>Welcome back</Text>
         <Formik
           validationSchema={LoginSchema}
-          initialValues={{phoneNumber: '', password: ''}}
+          initialValues={{ phoneNumber: "", password: "" }}
           onSubmit={(values, actions) => {
             actions.resetForm();
             Keyboard.dismiss();
-          }}>
+
+            fetch('http://nufastdeliveries.co.tz/?module=api&action=login', {
+              method: 'POST',
+              headers: {
+                Accept: 'application/json',
+                'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                phoneNumber: values.phoneNumber,
+                password: values.password,
+              }),
+            }).then((response) => response.json())
+                .then((responseJson) => {
+                 if(responseJson.status=='success'){
+                  //use of Asy 
+
+                  const storeData = async (value) => {
+                    try {
+                      await AsyncStorage.setItem('token', responseJson.token);
+                      await AsyncStorage.setItem('name', responseJson.name);
+                      await AsyncStorage.setItem('phoneNumber', responseJson.phoneNumber);
+                    } catch (e) {
+                      // saving error
+                    }
+                  }
+
+                  //redirect to the home page
+                 }else{
+                   //flash back message 
+                 }
+                   
+                })
+                .catch((error) => {
+                  console.error(error);
+                });
+
+          }}
+        >
           {(props) => (
             <View>
               <Input
-                inputStyle={{margin: 5}}
+                inputStyle={{ margin: 5 }}
                 placeholder="Phone number"
                 leftIcon={<Icon name="phone" size={24} color="#174778" />}
-                onChangeText={props.handleChange('phoneNumber')}
-                onBlur={props.handleBlur('phoneNumber')}
+                onChangeText={props.handleChange("phoneNumber")}
+                onBlur={props.handleBlur("phoneNumber")}
                 value={props.values.phoneNumber}
-                errorStyle={{color: 'red'}}
+                errorStyle={{ color: "red" }}
                 errorMessage={
                   props.touched.phoneNumber && props.errors.phoneNumber
                 }
                 keyboardType="phone-pad"
               />
               <Input
+
                 placeholder="Password"
-                inputStyle={{margin: 5}}
+                inputStyle={{ margin: 5 }}
                 leftIcon={<Icon name="lock" size={24} color="#174778" />}
-                onChangeText={props.handleChange('password')}
-                onBlur={props.handleBlur('password')}
+                onChangeText={props.handleChange("password")}
+                onBlur={props.handleBlur("password")}
                 value={props.values.password}
-                errorStyle={{color: 'red'}}
+                errorStyle={{ color: "red" }}
                 errorMessage={props.touched.password && props.errors.password}
                 secureTextEntry={true}
               />
@@ -67,7 +116,7 @@ const Login = () => {
               <Button
                 title="Login"
                 buttonStyle={styles.btnStyle}
-                onPress={() => props.handleSubmit()}
+                onPress={() => signIn()}
               />
             </View>
           )}
@@ -82,21 +131,21 @@ const Login = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#edf1f2',
-    height: '100%',
+    backgroundColor: "#edf1f2",
+    height: "100%",
     flex: 1,
   },
   headerText: {
     padding: 10,
-    color: '#174778',
-    textAlign: 'center',
+    color: "#174778",
+    textAlign: "center",
     fontSize: 20,
-    fontWeight: 'bold',
+    fontWeight: "bold",
   },
   loginForm: {
-    backgroundColor: '#fff',
+    backgroundColor: "#fff",
     borderRadius: 10,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: {
       width: 0,
       height: 2,
@@ -112,27 +161,27 @@ const styles = StyleSheet.create({
   btnStyle: {
     marginTop: 5,
     borderRadius: 20,
-    shadowColor: '#000',
+    shadowColor: "#000",
   },
   forgotPassword: {
     paddingTop: 15,
-    textAlign: 'right',
-    color: '#174778',
+    textAlign: "right",
+    color: "#174778",
     fontSize: 15,
   },
   topColor: {
-    backgroundColor: '#2661bf',
+    backgroundColor: "#2661bf",
     height: 250,
   },
   textColor: {
-    color: '#fff',
-    textAlign: 'center',
+    color: "#fff",
+    textAlign: "center",
     fontSize: 50,
-    marginTop: '18%',
+    marginTop: "18%",
     textShadowRadius: 5,
-    textShadowColor: '#555',
-    fontWeight: 'bold',
-    fontFamily: 'monospace',
+    textShadowColor: "#555",
+    fontWeight: "bold",
+    fontFamily: "monospace",
   },
 });
 
