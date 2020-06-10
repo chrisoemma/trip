@@ -14,6 +14,7 @@ const HamburgerNavigation = () => {
         drawerStyle={{
           width: 240,
           paddingTop: 100 / 2,
+          backgroundColor:'#edf1f2'
         }}
         drawerContent={(props) => <HamburgerNav {...props} />}
         drawerContentOptions={{

@@ -13,8 +13,6 @@ import { Input, Button } from "react-native-elements";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { Formik } from "formik";
 import * as yup from "yup";
-
-import { AsyncStorage } from '@react-native-community/async-storage';
 import { AuthContext } from "../../components/Context";
 
 
@@ -29,12 +27,12 @@ const LoginSchema = yup.object({
   password: yup.string().required("Password required").min(6),
 });
 
-const Login = () => {
+const Login = (props) => {
 
   const {signIn} = React.useContext(AuthContext);
 
   return (
-
+  
     <View style={styles.container}>
       <View style={styles.topColor}>
         <Text style={styles.textColor}>Trip</Text>
@@ -48,40 +46,7 @@ const Login = () => {
             actions.resetForm();
             Keyboard.dismiss();
 
-            fetch('http://nufastdeliveries.co.tz/?module=api&action=login', {
-              method: 'POST',
-              headers: {
-                Accept: 'application/json',
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                phoneNumber: values.phoneNumber,
-                password: values.password,
-              }),
-            }).then((response) => response.json())
-                .then((responseJson) => {
-                 if(responseJson.status=='success'){
-                  //use of Asy 
-
-                  const storeData = async (value) => {
-                    try {
-                      await AsyncStorage.setItem('token', responseJson.token);
-                      await AsyncStorage.setItem('name', responseJson.name);
-                      await AsyncStorage.setItem('phoneNumber', responseJson.phoneNumber);
-                    } catch (e) {
-                      // saving error
-                    }
-                  }
-
-                  //redirect to the home page
-                 }else{
-                   //flash back message 
-                 }
-                   
-                })
-                .catch((error) => {
-                  console.error(error);
-                });
+            signIn(values.phoneNumber,values.password);
 
           }}
         >
@@ -116,7 +81,7 @@ const Login = () => {
               <Button
                 title="Login"
                 buttonStyle={styles.btnStyle}
-                onPress={() => signIn()}
+                onPress={() => props.handleSubmit()}
               />
             </View>
           )}

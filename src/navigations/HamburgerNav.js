@@ -23,10 +23,13 @@ import {
 import { Header } from "react-native-elements";
 import { DrawerItem, DrawerContentScrollView } from "@react-navigation/drawer";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import { AuthContext } from "../components/Context";
 
-const phoneNumber = "+255 672137313";
+const phoneNumber = '+255785181718';
 
 const HamburgerNav = (props) => {
+
+  const {signOut} = React.useContext(AuthContext);
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
@@ -38,8 +41,8 @@ const HamburgerNav = (props) => {
             }}
             size={50}
           />
-          <Title style={styles.title}>User Name</Title>
-          <Caption style={styles.caption}>0746347898</Caption>
+          <Title style={styles.title}></Title>
+          <Caption style={styles.caption}></Caption>
         </View>
         <Drawer.Section style={styles.drawerSection}>
           <DrawerItem
@@ -65,7 +68,14 @@ const HamburgerNav = (props) => {
             label="Support"
             onPress={() => Linking.openURL(`tel:${phoneNumber}`)}
           />
-
+          
+          <DrawerItem
+            icon={({ size }) => (
+              <Icon name="logout" color="#2661bf" size={size} />
+            )}
+            label="Sign Out"
+            onPress={() => {signOut()}}
+          />
 
     
         </Drawer.Section>
@@ -77,6 +87,7 @@ const HamburgerNav = (props) => {
 const styles = StyleSheet.create({
   drawerContent: {
     flex: 1,
+    
   },
   userInfoSection: {
     paddingLeft: 20,

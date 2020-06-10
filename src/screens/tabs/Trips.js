@@ -1,76 +1,165 @@
-import React, { Component } from 'react';
-import { Text,StyleSheet, View, ScrollView } from 'react-native';
-import { Table, TableWrapper, Row } from 'react-native-table-component';
+import React, { useState,useEffect} from 'react';
+import { Text,StyleSheet, View, ScrollView,TouchableOpacity,SafeAreaView ,ActivityIndicator,Modal} from 'react-native';
+import { Button } from "react-native-elements";
+import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 
-export default class Trips extends Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      tableHead: ['#', 'Location', 'Pump. A','Client', 'Truck #', 'Product', 'Fuel(Lts)', 'Price(Tsh)', 'Date'],
-      widthArr: [40, 60, 80, 100, 120, 140, 160, 180, 200]
-    }
+
+const  Trips=()=>  {
+
+  const [isLoading, setIsLoading] = useState(true);
+  const [trips, setTrips] = useState([]);
+  const [modalVisible, setModalVisible] = useState(false);
+
+  useEffect(() => {
+    fetch('http://nufastdeliveries.co.tz/?module=api&action=user_trips')
+      .then((response) => response.json())
+      .then((json) => setTrips(json))
+      .catch((error) => console.error(error))
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: "center",
+          backgroundColor: "#2661bf",
+        }}
+      >
+        <ActivityIndicator size="large" color="#00ff00" />
+      </View>
+    );
   }
-
-  render() {
-    const state = this.state;
-    const tableData = [];
-    for (let i = 0; i < 6; i += 1) {
-      const rowData = [];
-      for (let j = 0; j < 10; j += 1) {
-        rowData.push(`${i}${j}`);
-      }
-      tableData.push(rowData);
-    }
 
     return (
       <>
+      <View style={styles.modalStyle} >
+        <Modal visible={modalVisible}>
+          <Text>Hello modal</Text>
+           <View >
+          <Button  title="Close" onPress={() => {
+                setModalVisible(!modalVisible);
+              }} buttonStyle={styles.btnStyle} />
+           </View>
+        </Modal>
+      </View>
+
       <View style={styles.topColor}>
       <Text style={styles.textColor}></Text>
      </View>
     
-      <View style={styles.container}>
-       
-        <ScrollView horizontal={true}>
-          <View>
-
-            <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-              <Row data={state.tableHead} widthArr={state.widthArr} style={styles.header} textStyle={styles.text}/>
-            </Table>
-            <ScrollView style={styles.dataWrapper}>
-              <Table borderStyle={{borderWidth: 1, borderColor: '#C1C0B9'}}>
-                {
-                  tableData.map((rowData, index) => (
-                    <Row
-                      key={index}
-                      data={rowData}
-                      widthArr={state.widthArr}
-                      style={[styles.row, index%2 && {backgroundColor: '#F7F6E7'}]}
-                      textStyle={styles.dataText}
-                    />
-                  ))
-                }
-              </Table>
-            </ScrollView>
+     <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView}>
+        <View style={styles.items}>
+        {trips.map((trip, i) => (
+          <View style={styles.item}>
+            <View style={styles.upperLayer}>
+             <Icon name="car-hatchback" size={30} color="#27e86b" />
+        <Text style={{ paddingLeft: 20, fontSize: 20 , fontWeight:'bold'}}>
+                Trip # 00{trip.id}</Text>
+              <Text style={{ paddingLeft:10, fontSize: 20 , fontWeight:'bold'}}>
+                to {trip.location} 
+              </Text>
+            </View>
+            <View style={styles.upperLayer}>
+              <Text style={{ paddingRight: 20, fontSize: 13 }}>
+                Truck # {trip.client_truck}
+              </Text>
+        <Text style={{paddingLeft:100,alignSelf: 'flex-end'}}>Client: {" "} {trip.client}</Text>
+            </View>
+            <View style={styles.upperLayer}>
+              <Text style={{ paddingRight: 20, fontSize: 13 }}>
+        Product : {trip.product}
+              </Text>
+        <Text style={{paddingLeft:90,alignSelf: 'flex-end'}}>Quantity(lts): {" "} {trip.fuel}</Text>
+            </View>
+            <View style={styles.upperLayer}>
+              <Text style={{ paddingRight: 20, fontSize: 13 }}>
+                Price(Tsh): {""}  {trip.price}
+              </Text>
+        <Text style={{paddingLeft:70,alignSelf: 'flex-end'}}>Attendant: {" "} {trip.attendant}</Text>
+            </View>
+            
+            <View style={styles.pricingLayer}>
+              <Text
+                style={{ paddingRight: 250, fontSize: 12, fontWeight: "bold" }}
+              >
+                Date: {trip.trip_date}
+              </Text>
+              <TouchableOpacity    onPress={() => {
+                setModalVisible(!modalVisible);
+              }}>
+              <Icon name="close-circle" size={25} color="#eb4034"  />
+              </TouchableOpacity>
+            </View>
           </View>
-        </ScrollView>
-      </View>
+     ))}
+       
+        </View>
+      </ScrollView>
+    </SafeAreaView>
       </>
     )
   }
-}
+
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16, paddingTop: 30, backgroundColor: '#edf1f2',
-  height: '100%', },
-  header: { height: 50, backgroundColor: '#2464c9' },
-  text: { textAlign: 'center', fontWeight: '100',color:'#fff' },
-  dataText:{ textAlign: 'center', fontWeight: '100'},
-  dataWrapper: { marginTop: -1 },
-  row: { height: 40, backgroundColor: '#E7E6E1' },
+  container: {
+    flex: 1,
+  },
+  items: {
+    backgroundColor: "#e8e8e8",
+  },
+
+  item: {
+    marginTop:15,
+    marginBottom: 10,
+    paddingTop: 15,
+    paddingBottom:15,
+    textAlign: "center",
+    justifyContent: "center",
+    backgroundColor: "#f2f2f2",
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
+    paddingLeft: 20,
+  },
+
+  upperLayer: {
+    flexDirection: "row",
+    alignItems: "center",
+    padding:8
+    
+  },
+  pricingLayer: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "flex-start",
+    paddingTop: 10,
+  },
+  scrollView: {
+    backgroundColor: "#edf1f2",
+  },
+
   topColor: {
     backgroundColor: '#2661bf',
     height: 100,
     borderBottomRightRadius:30,
     borderBottomStartRadius:30
   },
+  btnStyle:{
+    width:100
+  },
+  modalStyle:{
+   justifyContent:'center',
+   backgroundColor:'#000'
+  }
 });
+
+export default Trips

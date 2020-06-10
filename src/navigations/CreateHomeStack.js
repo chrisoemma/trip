@@ -39,6 +39,7 @@ const HomeStackScreen = ({navigation}) => {
           headerStyle: {
             elevation: 0,
             backgroundColor: '#2661bf', 
+           
           },
           headerLeft: () => (
             <TouchableOpacity>
@@ -47,7 +48,7 @@ const HomeStackScreen = ({navigation}) => {
                 color="#fff"
                 size={40}
                 onPress={() => navigation.openDrawer()}
-                iconStyle={{marginLeft:30}}
+                style={{marginLeft:15,marginRight:10}}
               />
             </TouchableOpacity>
           ),
