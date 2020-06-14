@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect,useState} from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -10,8 +10,37 @@ import {
 import { Avatar } from "react-native-elements";
 
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import AsyncStorage from "@react-native-community/async-storage";
+
 
 const Profile = () =>{
+
+
+  const [phoneNumber,setNumber] = React.useState(0);
+  const [name,setName] = React.useState("");
+
+
+  useEffect(() => {
+
+    const bootstrapAsync = async () => {
+      //  setIsLoading(false);
+      
+      try {
+
+       // userToken = await AsyncStorage.getItem("userToken");
+       const  userName = await AsyncStorage.getItem("name");
+         setName(JSON.parse(userName));
+       const userPhoneNumber = await AsyncStorage.getItem("phoneNumber");
+          setNumber(userPhoneNumber);
+        
+        
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    
+    bootstrapAsync();
+  }, []);
 
  return(
 	 <>
@@ -37,12 +66,12 @@ const Profile = () =>{
             fontWeight: "bold",
           }}
         >
-          Jane Doe
+          {name}
         </Text>
         <Text
           style={{ textAlign: "center", color: "#555", fontWeight: "bold" }}
         >
-          0745234567
+         {phoneNumber}
         </Text>
         <View style={styles.notificationSection}>
           <View style={{ padding: 10, justifyContent: "center", flex: 1 }}>

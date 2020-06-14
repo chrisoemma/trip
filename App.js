@@ -7,16 +7,13 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { ActivityIndicator, StyleSheet, View } from "react-native";
+import { ActivityIndicator, StyleSheet, View,Alert} from "react-native";
 import Login from "./src/screens/auth/Login";
-import Trips from "./src/screens/tabs/Trips";
 import HamburgerNavigation from "./src/navigations/HamburgerNavigation";
 import { AuthContext } from "./src/components/Context";
 import AsyncStorage from "@react-native-community/async-storage";
 
 const App = () => {
-  // const [isLoading,setIsLoading]=React.useState(true);
-  // const [userToken,setUserToken]=React.useState(null);
 
   initialLoginState = {
 
@@ -24,6 +21,7 @@ const App = () => {
     name: null,
     phoneNumber: null,
     userToken: null,
+    id:null
   };
 
   const loginReducer = (prevState, action) => {
@@ -41,6 +39,7 @@ const App = () => {
           name: action.name,
           phoneNumber: action.phoneNumber,
           isLoading: false,
+          id:action.id
         };
       case "LOGOUT":
         return {
@@ -49,6 +48,7 @@ const App = () => {
           name: null,
           phoneNumber: null,
           isLoading: false,
+          id:null
         };
     }
   };
@@ -87,12 +87,20 @@ const App = () => {
           await AsyncStorage.setItem("userToken", userToken);
           await AsyncStorage.setItem("name", JSON.stringify(responseJson.name));
           await AsyncStorage.setItem("phoneNumber", responseJson.phoneNumber);
+          await AsyncStorage.setItem("userId", responseJson.id);
+          dispatch({ type: "LOGIN", token: userToken, phoneNumber: phoneNumber});
+
         } catch (e) {
           console.error(e);
         }
+      }else{
+     
+       Alert.alert('Invalid User!','Phone number or password is incorrect.',[
+          {text:'Okay'}
+       ])
+      
+
       }
-      console.log("user Token: ", userToken);
-      dispatch({ type: "LOGIN", token: userToken, phoneNumber: phoneNumber});
     },
 
     
@@ -101,6 +109,7 @@ const App = () => {
         await AsyncStorage.removeItem("userToken");
         await AsyncStorage.removeItem("name");
         await AsyncStorage.removeItem("phoneNumber");
+        await AsyncStorage.removeItem("userId");
       } catch (e) {
         console.error(e);
       }
@@ -112,7 +121,8 @@ const App = () => {
 
   
   useEffect(() => {
-    setTimeout(async () => {
+
+    const bootstrapAsync =async () => {
       //  setIsLoading(false);
       let userToken;
       userToken = null;
@@ -122,17 +132,21 @@ const App = () => {
       phoneNumber = null;
       
       try {
+
         userToken = await AsyncStorage.getItem("userToken");
         name = await AsyncStorage.getItem("name");
         phoneNumber = await AsyncStorage.getItem("phoneNumber");
-       
+        userId = await AsyncStorage.getItem("userId");
       } catch (e) {
         console.error(e);
       }
 
-      dispatch({ type: "RETRIVE_TOKEN", token: userToken, });
-    },);
+      dispatch({ type: "RETRIVE_TOKEN", token: userToken});
+    };
+    bootstrapAsync();
   }, []);
+
+
 
   if (loginState.isLoading) {
     return (
@@ -147,10 +161,17 @@ const App = () => {
       </View>
     );
   }
+
+  
+  //alert(loginState.userToken);
   return (
     <AuthContext.Provider value={authContext}>
-      {loginState.userToken != null ? <HamburgerNavigation /> : <Login />}
+   
+      {loginState.userToken != null ? <HamburgerNavigation  /> : <Login />}
     </AuthContext.Provider>
+    // <View>
+    //   <Text>cOMING</Text>
+    // </View>
   );
 };
 

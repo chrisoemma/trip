@@ -71,7 +71,7 @@ const Login = (props) => {
                 inputStyle={{ margin: 5 }}
                 leftIcon={<Icon name="lock" size={24} color="#174778" />}
                 onChangeText={props.handleChange("password")}
-                onBlur={props.handleBlur("password")}
+             
                 value={props.values.password}
                 errorStyle={{ color: "red" }}
                 errorMessage={props.touched.password && props.errors.password}

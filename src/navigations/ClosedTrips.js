@@ -1,6 +1,7 @@
 import React, { useState,useEffect} from 'react';
-import { Text,StyleSheet, View, ScrollView,TouchableOpacity,SafeAreaView ,ActivityIndicator} from 'react-native';
+import { Text,StyleSheet, View, ScrollView,TouchableOpacity,SafeAreaView ,ActivityIndicator,RefreshControl} from 'react-native';
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
+import AsyncStorage from "@react-native-community/async-storage";
 
 
 const  ClosedTrips=()=>  {
@@ -8,9 +9,45 @@ const  ClosedTrips=()=>  {
   const [isLoading, setIsLoading] = useState(true);
   const [trips, setTrips] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
+  const [userId,setuserId] = React.useState("");
+
+ 
+
+  const url ="http://nufastdeliveries.co.tz/?module=api&action=user_closed_trips&id="+userId
+
+  const  wait =(timeout) =>{
+    return new Promise(resolve => {
+      setTimeout(resolve, timeout);
+    });
+  }
+
+  const onRefresh = React.useCallback(() => {
+    setRefreshing(true);
+
+    wait(2000).then(() => setRefreshing(false));
+  }, [refreshing]);
 
   useEffect(() => {
-    fetch('http://nufastdeliveries.co.tz/?module=api&action=user_closed_trips')
+
+    const bootstrapAsync = async () => {
+      //  setIsLoading(false);
+      
+      try {
+
+       // userToken = await AsyncStorage.getItem("userToken");
+       const  user_id = await AsyncStorage.getItem("userId");
+         setuserId(JSON.parse(user_id));     
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    
+    bootstrapAsync();
+
+   
+
+    fetch(url)
       .then((response) => response.json())
       .then((json) => setTrips(json))
       .catch((error) => console.error(error))
@@ -40,7 +77,9 @@ const  ClosedTrips=()=>  {
      </View>
     
      <SafeAreaView style={styles.container}>
-      <ScrollView style={styles.scrollView}>
+      <ScrollView style={styles.scrollView}  refreshControl={
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} colors={["#9Bd35A", "#689F38"]}/>
+        }>
         <View style={styles.items}>
         {trips.map((trip, i) => (
           <View style={styles.item}>
@@ -130,6 +169,7 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     backgroundColor: "#edf1f2",
+   
   },
 
   topColor: {

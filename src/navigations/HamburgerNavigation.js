@@ -8,13 +8,15 @@ import HamburgerNav from "./HamburgerNav";
 import { NavigationContainer } from "@react-navigation/native";
 
 const HamburgerNavigation = () => {
+  
   return (
     <NavigationContainer>
       <Drawer.Navigator
         drawerStyle={{
           width: 240,
           paddingTop: 100 / 2,
-          backgroundColor:'#edf1f2'
+          backgroundColor:'#f7f7f7'
+          
         }}
         drawerContent={(props) => <HamburgerNav {...props} />}
         drawerContentOptions={{

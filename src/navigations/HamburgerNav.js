@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect,useState} from "react";
 import {
   SafeAreaView,
   StyleSheet,
@@ -24,12 +24,46 @@ import { Header } from "react-native-elements";
 import { DrawerItem, DrawerContentScrollView } from "@react-navigation/drawer";
 import Icon from "react-native-vector-icons/MaterialCommunityIcons";
 import { AuthContext } from "../components/Context";
+import AsyncStorage from "@react-native-community/async-storage";
 
-const phoneNumber = '+255785181718';
+const supportNumber = '+255785181718';
+
+
+
 
 const HamburgerNav = (props) => {
 
-  const {signOut} = React.useContext(AuthContext);
+  const {signOut}= React.useContext(AuthContext);
+
+  const [phoneNumber,setNumber] = React.useState(0);
+  const [name,setName] = React.useState("");
+
+
+  useEffect(() => {
+
+    const bootstrapAsync = async () => {
+      //  setIsLoading(false);
+      
+      try {
+
+       // userToken = await AsyncStorage.getItem("userToken");
+       const  userName = await AsyncStorage.getItem("name");
+         setName(JSON.parse(userName));
+       const userPhoneNumber = await AsyncStorage.getItem("phoneNumber");
+          setNumber(userPhoneNumber);
+        
+        
+      } catch (e) {
+        console.error(e);
+      }
+    };
+    
+    bootstrapAsync();
+  }, []);
+
+
+ 
+ 
   return (
     <DrawerContentScrollView {...props}>
       <View style={styles.drawerContent}>
@@ -41,8 +75,8 @@ const HamburgerNav = (props) => {
             }}
             size={50}
           />
-          <Title style={styles.title}></Title>
-          <Caption style={styles.caption}></Caption>
+          <Title style={styles.title}>{name}</Title>
+          <Caption style={styles.caption}>{phoneNumber}</Caption>
         </View>
         <Drawer.Section style={styles.drawerSection}>
           <DrawerItem
@@ -66,7 +100,7 @@ const HamburgerNav = (props) => {
               <Icon name="phone" color="#2661bf" size={size} />
             )}
             label="Support"
-            onPress={() => Linking.openURL(`tel:${phoneNumber}`)}
+            onPress={() => Linking.openURL(`tel:${supportNumber}`)}
           />
           
           <DrawerItem
@@ -95,10 +129,13 @@ const styles = StyleSheet.create({
   title: {
     marginTop: 20,
     fontWeight: "bold",
+    marginBottom:10,
+    marginLeft:10
   },
   caption: {
     fontSize: 14,
     lineHeight: 14,
+    marginLeft:10
   },
   row: {
     marginTop: 20,
