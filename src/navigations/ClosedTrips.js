@@ -10,7 +10,6 @@ const  ClosedTrips=()=>  {
   const [trips, setTrips] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
-  const [userId,setuserId] = React.useState("");
 
  
 
@@ -37,7 +36,7 @@ const  ClosedTrips=()=>  {
 
        // userToken = await AsyncStorage.getItem("userToken");
        const  user_id = await AsyncStorage.getItem("userId");
-         setuserId(JSON.parse(user_id));     
+         userId=JSON.parse(user_id);     
       } catch (e) {
         console.error(e);
       }

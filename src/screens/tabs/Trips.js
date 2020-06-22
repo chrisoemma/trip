@@ -15,7 +15,8 @@ import Modal from "react-native-modal";
 import { Button, Input } from "react-native-elements";
 import AsyncStorage from "@react-native-community/async-storage";
 
-const Trips = () => {
+  const Trips = () => {
+
   const [isLoading, setIsLoading] = useState(true);
   const [trips, setTrips] = useState([]);
   const [isModalVisible, setModalVisible] = useState(false);
@@ -25,18 +26,23 @@ const Trips = () => {
   const [userId,setuserId] = React.useState("");
 
   const  wait =(timeout) =>{
+
     return new Promise(resolve => {
       setTimeout(resolve, timeout);
     });
   }
 
   const toggleModal = () => {
+
     setModalVisible(!isModalVisible);
   };
 
   const deleteFunction = (data) => {
+
     setModalVisible(!isModalVisible);
     setDeleteData(data);
+
+   
   };
 
 
@@ -47,6 +53,8 @@ const Trips = () => {
   }, [refreshing]);
 
   const deleteTrip = () => {
+
+ 
     fetch("http://nufastdeliveries.co.tz/?module=api&action=close_trip", {
       method: "POST",
       headers: {
@@ -62,9 +70,19 @@ const Trips = () => {
     .then((json) => {
      
        if(json.status=="success"){
+
+        setTrips(prevTrips=>{
+         
+          return  prevTrips.filter(item=>item.id!=deleteData.id);
+          
+        });
         
         setDeleteData({});
+
+        setDeliveryNote("");
+
         setModalVisible(!isModalVisible);
+
        }
     })
     .catch((error) => {
@@ -74,31 +92,65 @@ const Trips = () => {
     Keyboard.dismiss();
   };
 
+
+
+
+
+
   useEffect(() => {
- 
-    const bootstrapAsync = async () => {
-      //  setIsLoading(false);
       
-      try {
+        // userToken = await AsyncStorage.getItem("userToken");
 
-       // userToken = await AsyncStorage.getItem("userToken");
-       const  user_id = await AsyncStorage.getItem("userId");
-         setuserId(JSON.parse(user_id));     
-      } catch (e) {
-        console.error(e);
-      }
-    };
+
+        const bootstrapAsync = async () => {
+          //  setIsLoading(false);
+          
+          try {
     
-    bootstrapAsync();
+           // userToken = await AsyncStorage.getItem("userToken");
+            await AsyncStorage.getItem("userId")
+            .then((resp)=>setuserId(JSON.parse(resp)))
+             
+            .then((resp)=>{
+             const url = "http://nufastdeliveries.co.tz/?module=api&action=user_trips&id="+userId
+             fetch(url)
+            .then((response) => response.json())
+            .then((json) => setTrips(json))
+            .catch((error) => console.error(error))
+            .finally(() => setIsLoading(false));
+            }
+            ).catch((error) => {
+              console.error(error);
+            });
+           
+           
+                 
+          } catch (e) {
+            console.error(e);
+          }
+        };
+        
+        bootstrapAsync();
 
-    const url = "http://nufastdeliveries.co.tz/?module=api&action=user_trips&id="+userId
+        AsyncStorage.getItem("userId").then((user_id)=>{
+          setuserId(JSON.parse(user_id)); 
+         
+          const url = "http://nufastdeliveries.co.tz/?module=api&action=user_trips&id="+userId
+          fetch(url)
+            .then((response) => response.json())
+            .then((json) => setTrips(json))
+            .catch((error) => console.error(error))
+            .finally(() => setIsLoading(false));
+           
+       });
 
-    fetch(url)
-      .then((response) => response.json())
-      .then((json) => setTrips(json))
-      .catch((error) => console.error(error))
-      .finally(() => setIsLoading(false));
-  }, []);
+       const user_id = AsyncStorage.getItem('userId');
+       
+     
+
+    
+
+  },[]);
 
   if (isLoading) {
     return (

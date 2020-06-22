@@ -148,19 +148,19 @@ const App = () => {
 
 
 
-  if (loginState.isLoading) {
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: "center",
-          backgroundColor: "#2661bf",
-        }}
-      >
-        <ActivityIndicator size="large" color="#00ff00" />
-      </View>
-    );
-  }
+  // if (loginState.isLoading) {
+  //   return (
+  //     <View
+  //       style={{
+  //         flex: 1,
+  //         justifyContent: "center",
+  //         backgroundColor: "#2661bf",
+  //       }}
+  //     >
+  //       <ActivityIndicator size="large" color="#00ff00" />
+  //     </View>
+  //   );
+  // }
 
   
   //alert(loginState.userToken);
@@ -169,9 +169,7 @@ const App = () => {
    
       {loginState.userToken != null ? <HamburgerNavigation  /> : <Login />}
     </AuthContext.Provider>
-    // <View>
-    //   <Text>cOMING</Text>
-    // </View>
+ 
   );
 };
 
